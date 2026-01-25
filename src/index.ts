@@ -33,6 +33,6 @@ app.get("/", (req, res) => {
   res.send("Hello welcome to classroom API");
 });
 
-app.listen(Number(PORT), "0.0.0.0", () => {
+app.listen(Number(PORT), () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
