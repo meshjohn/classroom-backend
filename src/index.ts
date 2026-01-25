@@ -11,7 +11,7 @@ AgentAPI.config();
 
 const app = express();
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 app.use(
   cors({
@@ -33,6 +33,6 @@ app.get("/", (req, res) => {
   res.send("Hello welcome to classroom API");
 });
 
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(Number(PORT), "0.0.0.0", () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
