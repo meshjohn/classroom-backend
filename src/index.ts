@@ -7,7 +7,7 @@ import securityMiddleware from "./middleware/security.js";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
 
-AgentAPI.config()
+AgentAPI.config();
 
 const app = express();
 
@@ -33,6 +33,6 @@ app.get("/", (req, res) => {
   res.send("Hello welcome to classroom API");
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
