@@ -1,6 +1,5 @@
 import express from "express";
 import { and, desc, eq, getTableColumns, ilike, or, sql } from "drizzle-orm";
-
 import { db } from "../db/index.js";
 import { classes, departments, subjects } from "../db/schema/app.js";
 import { user } from "../db/schema/auth.js";
@@ -89,10 +88,8 @@ router.get("/", async (req, res) => {
 // Get class details with teacher, subject, and department
 router.get("/:id", async (req, res) => {
   const classId = Number(req.params.id);
-
   if (!Number.isFinite(classId))
     return res.status(400).json({ error: "No Class found." });
-
   const [classDetails] = await db
     .select({
       ...getTableColumns(classes),
@@ -111,9 +108,7 @@ router.get("/:id", async (req, res) => {
     .leftJoin(user, eq(classes.teacherId, user.id))
     .leftJoin(departments, eq(subjects.departmentId, departments.id))
     .where(eq(classes.id, classId));
-
   if (!classDetails) return res.status(404).json({ error: "No Class found." });
-
   res.status(200).json({ data: classDetails });
 });
 
