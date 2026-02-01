@@ -12,7 +12,7 @@ import {
   session,
   subjects,
   user,
-} from "../src/db/schema";
+} from "../src/db/schema/index.js";
 
 type SeedUser = {
   id: string;
