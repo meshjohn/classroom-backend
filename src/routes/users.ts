@@ -8,7 +8,7 @@ import {
   enrollments,
   subjects,
   user,
-} from "../db/schema/index";
+} from "../db/schema/index.js";
 
 const router = express.Router();
 
