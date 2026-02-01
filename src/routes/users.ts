@@ -8,7 +8,7 @@ import {
   enrollments,
   subjects,
   user,
-} from "../db/schema/index.js";
+} from "../db/schema/index";
 
 const router = express.Router();
 
@@ -315,5 +315,7 @@ router.get("/:id/subjects", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch user subjects" });
   }
 });
+
+
 
 export default router;

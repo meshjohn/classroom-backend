@@ -47,12 +47,66 @@ router.get("/", async (req, res) => {
         page: currentPage,
         limit: limitPerPage,
         total: totalCount,
-        totalPages: Math.ceil(totalCount / limitPerPage),
       },
     });
   } catch (error) {
     console.error(`Error fetching subjects: ${error}`);
     return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Create subject
+router.post("/", async (req, res) => {
+  try {
+    console.log("POST /subjects - Request body:", req.body);
+    const { departmentId, name, code, description } = req.body;
+
+    // Validate required fields
+    if (!departmentId || !name || !code || !description) {
+      return res.status(400).json({ 
+        error: "departmentId, name, code, and description are required" 
+      });
+    }
+
+    // Check if department exists
+    const [department] = await db
+      .select()
+      .from(departments)
+      .where(eq(departments.id, departmentId))
+      .limit(1);
+
+    if (!department) {
+      return res.status(404).json({ error: "Department not found" });
+    }
+
+    // Check if subject code already exists
+    const [existingCode] = await db
+      .select()
+      .from(subjects)
+      .where(eq(subjects.code, code))
+      .limit(1);
+
+    if (existingCode) {
+      return res.status(409).json({ error: "Subject code already exists" });
+    }
+
+    // Insert subject
+    const [newSubject] = await db
+      .insert(subjects)
+      .values({
+        departmentId,
+        name,
+        code,
+        description,
+      })
+      .returning();
+
+    console.log("POST /subjects - Success, subject created:", newSubject);
+    res.status(201).json({ data: newSubject });
+
+  } catch (error) {
+    console.error("POST /subjects error:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
