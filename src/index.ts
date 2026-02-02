@@ -22,7 +22,7 @@ const PORT = parseInt(process.env.PORT || '8000', 10);
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL, // React app URL
+    origin: process.env.FRONTEND_URL?.replace(/\/$/, ""), // React app URL (normalized)
     methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed HTTP methods
     credentials: true, // allow cookies
   }),
