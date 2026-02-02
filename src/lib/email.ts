@@ -26,6 +26,14 @@ export const sendEmail = async ({
   text: string;
   html?: string;
 }) => {
+  console.log("Attempting to send email to:", to);
+  console.log("SMTP Config Check:", {
+    user: process.env.SMTP_USER ? "Set" : "Missing",
+    pass: process.env.SMTP_PASS ? "Set" : "Missing",
+    host: process.env.SMTP_HOST,
+    port: port
+  });
+
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
     console.warn(
       "SMTP credentials not found. Email not sent. Please set SMTP_USER and SMTP_PASS in .env",
