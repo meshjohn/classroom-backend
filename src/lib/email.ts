@@ -1,10 +1,11 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import SMTPTransport from "nodemailer/lib/smtp-transport/index.js";
 
 dotenv.config();
 
 // Vercel works best with Port 465 + Secure: true
-const port = 465; 
+const port = 465;
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -18,7 +19,7 @@ const transporter = nodemailer.createTransport({
   family: 4, // Forces IPv4 to avoid Gmail's IPv6 filtering
   connectionTimeout: 10000, // 10 seconds
   greetingTimeout: 10000,
-});
+} as SMTPTransport.Options);
 
 export const sendEmail = async ({
   to,
@@ -37,10 +38,11 @@ export const sendEmail = async ({
   }
 
   try {
-    // IMPORTANT: On Vercel, you MUST 'await' the result 
+    // IMPORTANT: On Vercel, you MUST 'await' the result
     // before the function finishes.
     const info = await transporter.sendMail({
-      from: process.env.SMTP_FROM || `"Classroom App" <${process.env.SMTP_USER}>`,
+      from:
+        process.env.SMTP_FROM || `"Classroom App" <${process.env.SMTP_USER}>`,
       to,
       subject,
       text,
@@ -48,7 +50,7 @@ export const sendEmail = async ({
     });
 
     console.log("Message sent: %s", info.messageId);
-    return info; 
+    return info;
   } catch (error) {
     console.error("Error sending email:", error);
     throw error; // Throwing here lets Vercel know the function failed
