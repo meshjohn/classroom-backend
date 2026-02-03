@@ -1,25 +1,20 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import SMTPTransport from "nodemailer/lib/smtp-transport/index.js";
 
 dotenv.config();
 
-// Vercel works best with Port 465 + Secure: true
-const port = 465;
+const port = parseInt(process.env.SMTP_PORT || "587");
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
+  host: process.env.SMTP_HOST || "smtp.gmail.com",
+  service: "gmail",
   port: port,
-  secure: true, // true for 465
+  secure: true,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-  // CRITICAL FOR CLOUD HOSTS:
-  family: 4, // Forces IPv4 to avoid Gmail's IPv6 filtering
-  connectionTimeout: 10000, // 10 seconds
-  greetingTimeout: 10000,
-} as SMTPTransport.Options);
+});
 
 export const sendEmail = async ({
   to,
@@ -32,17 +27,25 @@ export const sendEmail = async ({
   text: string;
   html?: string;
 }) => {
+  console.log("Attempting to send email to:", to);
+  console.log("SMTP Config Check:", {
+    user: process.env.SMTP_USER ? "Set" : "Missing",
+    pass: process.env.SMTP_PASS ? "Set" : "Missing",
+    host: process.env.SMTP_HOST,
+    port: port
+  });
+
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    console.warn("SMTP credentials missing.");
+    console.warn(
+      "SMTP credentials not found. Email not sent. Please set SMTP_USER and SMTP_PASS in .env",
+    );
+    console.log(`[Mock Email] To: ${to}, Subject: ${subject}, Body: ${text}`);
     return;
   }
 
   try {
-    // IMPORTANT: On Vercel, you MUST 'await' the result
-    // before the function finishes.
     const info = await transporter.sendMail({
-      from:
-        process.env.SMTP_FROM || `"Classroom App" <${process.env.SMTP_USER}>`,
+      from: process.env.SMTP_FROM || '"Classroom App" <no-reply@classroom.com>',
       to,
       subject,
       text,
@@ -50,9 +53,8 @@ export const sendEmail = async ({
     });
 
     console.log("Message sent: %s", info.messageId);
-    return info;
   } catch (error) {
     console.error("Error sending email:", error);
-    throw error; // Throwing here lets Vercel know the function failed
+    // Don't throw to prevent crashing auth flow, but log error
   }
 };
